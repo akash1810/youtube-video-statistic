@@ -1,0 +1,240 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../core-ajax/core-ajax.html">
+<link rel="import" href="../core-item/core-item.html">
+<link rel="import" href="../core-tooltip/core-tooltip.html">
+<link rel="import" href="../core-icon/core-icon.html">
+<link rel="import" href="../core-icons/core-icons.html">
+<link rel="import" href="../core-icons/av-icons.html">
+<link rel="import" href="../core-icons/communication-icons.html">
+
+<link rel="import" href="../google-youtube/google-youtube.html">
+
+<script src="../numeral/min/numeral.min.js"></script>
+
+<!--
+Adding video statistics to the standard YouTube embedable video.
+
+##### Example
+
+    <youtube-video-statistic videoid="yRbOSdAe_JU" apiKey="AIzaSyDq6ojHsOAqd"
+                             viewCount commentCount>
+    </youtube-video-statistic>
+
+@element youtube-video-statistic
+@blurb Adding video statistics to the standard YouTube embedable video.
+@status alpha
+@homepage http://akash1810.github.io/youtube-video-statistic
+-->
+<polymer-element name="youtube-video-statistic" 
+         extends="google-youtube" 
+         attributes="apiKey viewCount likeCount dislikeCount favoriteCount commentCount">
+
+  <template>
+    <link rel="stylesheet" href="youtube-video-statistic.css">
+
+    <div class="wrapper" style="width: {{width}}; height: {{height}}">
+      <shadow></shadow>
+      <template if="{{apiKey}}">
+        <core-ajax  auto 
+              url="https://www.googleapis.com/youtube/v3/videos"
+              params='{"part": "statistics", "id":"{{videoid}}", "key": "{{apiKey}}"}'
+              handleAs="json"
+              on-core-response="{{handleYouTubeApiResponse}}"
+              on-core-error="{{handleYouTubeApiError}}">
+        </core-ajax>
+
+        <template if="{{apiError}}">
+          <div class="container error-container">
+            <core-item icon="error" label="{{_apiError}}">
+          </div>
+        </template>
+
+        <template if="{{statistics}}">
+          <div class="container statistic-container" style="width: {{width}}">
+            <ul>
+              <template repeat="{{stat in statistics}}">
+                <li id="{{stat.id}}">
+                  <core-tooltip label="{{stat.name}}: {{stat.value}}">
+                    <core-item icon="{{stat.icon}}" label="{{stat.value}}"></core-item>
+                  </core-tooltip>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer("youtube-video-statistic", {
+      /**
+       * The `apiKey` attribute is used requests to the YouTube Data API (v3).
+       * 
+       * If omitted, this element acts as a normal google-youtube element.
+       *
+       * See https://developers.google.com/youtube/v3/getting-started#before-you-start for further information.
+       * 
+       * @attribute apiKey
+       * @type string
+       * @default ""
+       */
+      apiKey: "",
+      
+      /**
+       * The `viewCount` attribute determines if the total number of views of the video is displayed.
+       *
+       * @attribute viewCount
+       * @type bool
+       * @default true
+       */
+      viewCount: true,
+
+      /**
+       * The `likeCount` attribute determines if the total number of likes of the video is displayed.
+       *
+       * @attribute likeCount
+       * @type bool
+       * @default false
+       */
+      likeCount: false,
+
+      /**
+       * The `dislikeCount` attribute determines if the total number of dislikes of the video is displayed.
+       *
+       * @attribute dislikeCount
+       * @type bool
+       * @default false
+       */
+      dislikeCount: false,
+
+      /**
+       * The `favoriteCount` attribute determines if the total number of favorites of the video is displayed.
+       *
+       * @attribute favoriteCount
+       * @type bool
+       * @default false
+       */
+      favoriteCount: false,
+
+      /**
+       * `commentCount` attribute determines if the total number of comments of the video is displayed.
+       *
+       * @attribute commentCount
+       * @type bool
+       * @default false
+       */
+      commentCount: false,
+      
+      /**
+      * An array of statistics for the selected video.
+      * Each element of the array is an object with keys:
+      *   - id
+      *   - name
+      *   - value
+      *   - icon
+      *
+      * @property statistics
+      * @type array
+      * @default []
+      */
+      statistics: [],
+
+      /**
+      * The message to display if the core-ajax call to the YouTube Data API (v3) failed.
+      *
+      * @property apiError
+      * @type string
+      * @default ""
+      */
+      apiError: "",
+
+      /**
+      * An object that provides a lookup between statistic key and core-icon value.
+      * 
+      * @property _iconMap
+      * @type object
+      * @private
+      */
+      _iconMap: {
+        viewCount: "av:play-circle-fill",
+        likeCount: "thumb-up",
+        dislikeCount: "thumb-down",
+        favoriteCount: "favorite",
+        commentCount: "communication:comment"
+      },
+
+      /**
+      * The error message if the core-ajax call to the YouTube Data API (v3) failed due to 'keyInvalid'.
+      *
+      * @property _invalidKeyMsg
+      * @type string
+      * @private
+      */
+      _invalidKeyMsg : "Missing or invalid API key. See the <youtube-video-statistic> documentation for information on setting the \"apiKey\" property.",
+
+      /**
+       * Helper function to turn an API response to an object to be rendered in the template.
+       *
+       * @method _apiStatToHtml
+       * @param {String} key The key received from the statistics property in the API reponse.
+       * @return {Object} Returns an object with id, name, value and icon keys.
+       * @private
+       */
+      _apiStatToHtml: function (key, value) {
+        var name = key.replace('Count', 's');
+        var htmlStatName = name.charAt(0).toUpperCase() + name.slice(1);
+        var htmlStatValue = numeral(value).format("0a");
+        
+        return {
+          id: key,
+          name: htmlStatName, 
+          value: htmlStatValue,
+          icon: this._iconMap[key]
+        };
+      },
+
+      /**
+      * Handle the response from a successful call to the YouTube Data API (v3), setting the `statistic` property.
+      *
+      * See https://developers.google.com/apis-explorer/#p/youtube/v3/youtube.videos.list?part=statistics&id=yRbOSdAe_JU&_h=1& for an example response.
+      *
+      * @method handleYouTubeApiResponse
+      * @param {Object} e The response from a, successful, call to the YouTube Data API (v3).
+      */
+      handleYouTubeApiResponse: function (e) {
+        var response = e.detail.response;
+
+        if (response.items.length === 0) { return; }
+
+        var apiStatistics = response.items[0].statistics;
+        this.statistics = [];
+
+        Object.keys(apiStatistics).forEach(function(statName) {
+          if (this[statName]) {
+            this.statistics.push(this._apiStatToHtml(statName, apiStatistics[statName]));
+          };
+        }.bind(this));
+
+        this.fire('statistics-calculated', this.statistics);
+      },
+      
+      /**
+      * Handle the response from a failed call to the YouTube Data API (v3), setting the `apiError` property.
+      *
+      * If the response includes 'keyInvalid' we return a more informative response of this._invalidKeyMsg.
+      *
+      * @method handleYouTubeApiError
+      * @param {Object} e The response from a, failed, call to the YouTube Data API (v3).
+      */
+      handleYouTubeApiError: function (e) {
+        this.apiError = e.detail.response.indexOf('keyInvalid') >= 0
+          ? this._invalidKeyMsg
+          : e.detail.response;
+      }
+    });
+
+  </script>
+
+</polymer-element>

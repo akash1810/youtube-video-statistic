@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>seed-element</title>
+
+  <script src="../../webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../youtube-video-statistic.html">
+</head>
+<body>
+
+  <youtube-video-statistic id="default"
+      videoid="yRbOSdAe_JU"
+      apiKey="AIzaSyDq6ojHsOAqd8lCuYIWGeRMtOXvfLNEEh0">
+  </youtube-video-statistic>
+
+  <youtube-video-statistic id="custom"
+      videoid="yRbOSdAe_JU"
+      apiKey="AIzaSyDq6ojHsOAqd8lCuYIWGeRMtOXvfLNEEh0" viewCount likeCount dislikeCount>
+  </youtube-video-statistic>
+
+  <script>
+    suite("<youtube-video-statistic>", function() {
+      test("default behaviour shows only views", function() {
+        var el = document.querySelector("#default");
+
+        assert.equal(el.viewCount, true);
+
+        el.addEventListener("statistics-calculated", function (e) {
+          assert.equal(e.length, 1);
+          assert.equal(e[0].id, "views");
+          assert.equal(e[0].name, "viewCount");
+          assert.equal(e[0].icon, "av:play-circle-fill");
+          done();
+        });
+      });
+
+      test("only select statistics are displayed", function() {
+        var el = document.querySelector("#custom");
+
+        el.addEventListener("statistics-calculated", function (e) {
+          assert.equal(e.length, 3);
+
+          var expected = [
+            { id: "views", name: "viewCount", icon: "av:play-circle-fill" },
+            { id: "likes", name: "likeCount", icon: "thumb-up" },
+            { id: "dislikes", name: "dislikeCount", icon: "thumb-down" }
+          ];
+
+          var actual = [];
+
+          e.forEach(function (i) {
+            i.push({ id: i.id, name: i.name, icon: i.icon });
+          });
+
+          assert.equal(actual, expected);
+          done();
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
