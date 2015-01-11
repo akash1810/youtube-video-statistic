@@ -1,0 +1,7 @@
+{
+  "name": "youtube-video-statistic#gh-pages",
+  "private": true,
+  "dependencies": {
+    "youtube-video-statistic": "akash1810/youtube-video-statistic#master"
+  }
+}

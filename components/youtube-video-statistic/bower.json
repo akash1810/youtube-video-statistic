@@ -1,0 +1,41 @@
+{
+  "name": "youtube-video-statistic",
+  "version": "0.0.1",
+  "authors": [
+    "Akash A <akash1810@gmail.com>"
+  ],
+  "description": "Adding video statistics to the standard YouTube embedable video.",
+  "keywords": [
+    "youtube",
+    "youtube-video-embed",
+    "web-components",
+    "web-component"
+  ],
+  "main": "youtube-video-statistic.html",
+  "license": "MIT",
+  "homepage": "https://github.com/akash1810/youtube-video-statistic/",
+  "ignore": [
+    "/.*",
+    "/tests/",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "../",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^0.5.2",
+    "core-ajax": "Polymer/core-ajax#~0.5.2",
+    "core-item": "Polymer/core-item#~0.5.2",
+    "core-tooltip": "Polymer/core-tooltip#~0.5.2",
+    "core-icons": "Polymer/core-icons#~0.5.2",
+    "core-iconset": "Polymer/core-iconset#~0.5.2",
+    "core-iconset-svg": "Polymer/core-iconset-svg#~0.5.2",
+    "google-youtube": "GoogleWebComponents/google-youtube#~1.0.1",
+    "numeral": "~1.5.3"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^2.0.5"
+  }
+}

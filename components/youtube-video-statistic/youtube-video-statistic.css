@@ -1,0 +1,45 @@
+:host {
+	display: block;
+}
+
+:host /deep/ #icon {
+	margin: 0 4px 0 4px;
+}
+
+core-item {
+	color: #545A5E;
+}
+
+.wrapper {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.container {
+	background-color: #FFFFFF;
+	height: 40px;
+	line-height: 40px;
+}
+
+.error-container {
+	overflow-x: scroll;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    display: inline;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+ul li:last-child{
+	   padding-right: 0px;
+}
+ul li:first-child{
+	   padding-left: 0px;
+}
